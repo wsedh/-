@@ -1,0 +1,503 @@
+#include<iostream>
+using namespace std;
+#include<string>
+#include<vector>
+#include<fstream>
+#include<algorithm>
+class person
+{
+public:
+	person()
+	{
+
+	}
+	person(string name, string tel, string address)
+	{
+		this->name = name;
+		this->address = address;
+		this->tel = tel;
+	}
+	string name;
+	string tel;
+	string address;
+};
+void ininv(vector<person>& v)
+{
+	ifstream ifs;
+	ifs.open("tongxunlu.txt", ios::in);
+	string tmp;
+	int n = 1;
+	person p;
+	while (ifs >> tmp)
+	{
+		if (n == 3)
+		{
+			p.address = tmp;
+			v.push_back(p);
+			n = 0;
+		}
+		else if (n == 2)
+		{
+			p.tel = tmp;
+		}
+		else
+		{
+			p.name = tmp;
+		}
+		n++;
+	}
+	ifs.close();
+}
+void menu()
+{
+	cout << "***** 1.添加联系人 *****" << endl; 
+	cout << "***** 2.显示联系人 *****" << endl;
+	cout << "***** 3.删除联系人 *****" << endl;
+	cout << "***** 4.查找联系人 *****" << endl;
+	cout << "***** 5.修改联系人 *****" << endl;
+	cout << "***** 6.清空联系人 *****" << endl;
+	cout << "***** 0.退出通讯录 *****" << endl;
+	cout << "** 请输入要进行的操作> ";
+}
+void addperson(vector<person>&v)
+{
+	cout << "请输入你要添加的人数>" << endl;
+	int num;
+	cin >> num;
+	if (num > 0)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			string name;
+			string tel;
+			string address;
+			cout << "输入第" << i + 1 << "个人的信息" << endl;
+			cout << "请输入姓名：";
+			cin >> name;
+			cout << "请输入电话：";
+			cin >> tel;
+			cout << "请输入地址：";
+			cin >> address;
+			person p(name, tel, address);
+			v.push_back(p);
+			ofstream ofs;
+			ofs.open("tongxunlu.txt", ios::out | ios::app);
+			ofs << name << " " << tel << " " << address << " ";
+			ofs.close();
+		}
+		cout << "添加完成" << endl;
+		system("pause");
+		system("cls");
+	}
+	else
+		cout << "输入错误" << endl;
+}
+void showperson(vector<person>&v)
+{
+	v.clear();
+	ifstream ifs;
+	ifs.open("tongxunlu.txt",ios::in);
+	string tmp;
+	int n = 1;
+	person p;
+	int countperson = 0;
+	while (ifs >> tmp)
+	{
+		if (n == 3)
+		{
+			p.address = tmp;
+			countperson++;
+			v.push_back(p);
+			n = 0;
+		}
+		else if (n == 2)
+		{
+			p.tel = tmp;
+		}
+		else
+		{
+			p.name = tmp;
+		}
+		n++;
+	}
+	//测试代码
+	//cout << v.back().name << " " << v.back().tel << " " << v.back().address;
+	ifs.close();
+	cout << "通讯录中人员如下" << endl;
+	for (int i = 0; i < countperson; i++)
+	{
+		person p;
+		p = v[i];
+		cout << "姓名：" << p.name << "   电话：" << p.tel << "   住址：" << p.address << endl;
+	}
+	system("pause");
+	system("cls");
+}
+//删除
+void deleteperson(vector<person>&v)
+{
+	cout << "请输入查找删除方式>" << endl;
+	cout << "** 1.通过姓名查找删除 **" << endl;
+	cout << "** 2.通过手机查找删除 **" << endl;
+	cout << " 输入其他数字返回上一级 " << endl;
+	int n;
+	cin >> n;
+	bool p = false;
+	if (n == 1)
+	{
+		string name;
+		cout << "请输入要删除的人的姓名> ";
+		cin >> name;
+		vector<person>::iterator it = v.begin();
+		for (; it != v.end(); it++)
+		{
+			if (it->name == name)
+			{
+			ret:
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+				cout << "****** 1.确认 ******" << endl<<"****** 2.取消 ******"<<endl<<"确定要删除吗>";
+				int a;
+				cin >> a;
+				if (a == 1)
+				{
+					if (it + 1 != v.end())
+						it = v.erase(it);
+					else
+						v.clear();
+					cout<<"删除成功"<<endl;
+					system("pause");
+					system("cls");
+					break;
+				}
+				else if (a == 2)
+				{
+					cout << "取消成功" << endl;
+					system("pause");
+					system("cls");
+					break;
+				}
+				else
+				{
+					cout << "输入错误" << endl;
+					system("pause");
+					system("cls");
+					goto ret;
+				}
+			}
+		}
+		ofstream ofs;
+		ofs.open("tongxunlu.txt", ios::out);
+		for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+		{
+			ofs << it1->name << " " << it1->tel << " " << it1->address << " ";
+		}
+		ofs.close();
+	}
+	else if (n == 2)
+	{
+		string tel;
+		cout << "请输入要删除人的手机> ";
+		cin >> tel;
+		vector<person>::iterator it = v.begin();
+		for (; it != v.end(); it++)
+		{
+			if (it->tel == tel)
+			{
+			ret2:
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+				cout << "****** 1.确认 ******" << endl << "****** 2.取消 ******" << endl << "确定要删除吗>";
+				int a;
+				cin >> a;
+				if (a == 1)
+				{
+					if (it + 1 != v.begin())
+						it = v.erase(it);
+					else
+						v.clear();
+					cout << "删除成功" << endl;
+					system("pause");
+					system("cls");
+					break;
+				}
+				else if(a==2)
+				{
+					cout << "取消成功" << endl;
+					system("pause");
+					system("cls");
+					
+					break;
+				}
+				else
+				{
+					cout << "输入错误" << endl;
+					system("pause");
+					system("cls");
+					goto ret2;
+				}
+			}
+			
+		}
+		ofstream ofs;
+		ofs.open("tongxunlu.txt", ios::out);
+		for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+		{
+			ofs << it1->name << " " << it1->tel << " " << it1->address << " ";
+		}
+		ofs.close();
+	}
+	else
+	{
+		p = true;
+		system("pause");
+		system("cls");
+	}
+	if (!p)
+	{
+		cout << "未找到该联系人" << endl;
+		system("pause");
+		system("cls");
+	}
+}
+//查找
+void findperson(vector<person>& v)
+{
+	ret:
+	cout << "请输入查找方式>" << endl;
+	cout << "** 1.通过姓名查找 **" << endl;
+	cout << "** 2.通过手机查找 **" << endl;
+	int n;
+	cin >> n;
+	bool p = false;
+	if (n == 1)
+	{
+		string name;
+		cout << "请输入姓名> ";
+		cin >> name;
+		vector<person>::iterator it = v.begin();
+		for (; it != v.end(); it++)
+		{
+			if (it->name == name)
+			{
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+			}
+			
+		}
+	}
+	else if (n == 2)
+	{
+		string tel;
+		cout << "请输入手机> ";
+		cin >> tel;
+		vector<person>::iterator it = v.begin();
+		for (; it != v.end(); it++)
+		{
+			if (it->tel == tel)
+			{
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+			}
+		}
+	}
+	else
+	{
+		cout << "输入错误，请重新输入" << endl;
+		system("pause");
+		system("cls");
+		goto ret;
+	}
+	if (!p)
+	{
+		cout << "未查找到该联系人" << endl;
+	}
+	system("pause");
+	system("cls");
+}
+//修改
+void setperson(vector<person>&v)
+{
+	cout << "请输入查找修改方式>" << endl;
+	cout << "** 1.通过姓名查找修改 **" << endl;
+	cout << "** 2.通过手机查找修改 **" << endl;
+	cout << "* 输入其他数字返回上一级 *" << endl;
+	int n;
+	cin >> n;
+	bool p = false;
+	vector<person>::iterator it = v.begin();
+	if (n == 1)
+	{
+		string name;
+		cout << "请输入姓名> ";
+		cin >> name;
+		for (; it != v.end(); it++)
+		{
+			if (it->name == name)
+			{
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+				string xname;
+				string xtel;
+				string xaddress;
+				cout << "开始修改--" << endl;
+				cout << "请输入姓名：";
+				cin >> xname;
+				cout << "电话：";
+				cin >> xtel;
+				cout << "地址：";
+				cin >> xaddress;
+				
+				it->name = xname;
+				it->tel = xtel;
+				it->address = xaddress;
+				ofstream ofs;
+				ofs.open("tongxunlu.txt", ios::out);
+				for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+				{
+					ofstream ofs;
+					ofs.open("tongxunlu.txt", ios::out);
+					for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+					{
+						ofs << it1->name << " " << it1->tel << " " << it1->address << " ";
+					}
+					ofs.close();
+					
+				}
+				cout << "修改成功" << endl;
+				system("pause");
+				system("cls");
+				break;
+			}
+			
+		}
+		
+	}
+	else if (n == 2)
+	{
+		string tel;
+		cout << "请输入手机> ";
+		cin >> tel;
+		it = v.begin();
+		for (; it != v.end(); it++)
+		{
+			if (it->tel == tel)
+			{
+				p = true;
+				cout << "查找成功！" << endl;
+				cout << "姓名：" << it->name << "   电话：" << it->tel << "   住址：" << it->address << endl;
+				string xname;
+				string xtel;
+				string xaddress;
+				cout << "开始修改--" << endl;
+				cout << "请输入姓名：";
+				cin >> xname;
+				cout << "电话：";
+				cin >> xtel;
+				cout << "地址：";
+				cin >> xaddress;
+
+				it->name = xname;
+				it->tel = xtel;
+				it->address = xaddress;
+				ofstream ofs;
+				ofs.open("tongxunlu.txt", ios::out);
+				for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+				{
+					ofstream ofs;
+					ofs.open("tongxunlu.txt", ios::out);
+					for (vector<person>::iterator it1 = v.begin(); it1 != v.end(); it1++)
+					{
+						ofs << it1->name << " " << it1->tel << " " << it1->address << " ";
+					}
+					ofs.close();
+
+				}
+				cout << "修改成功" << endl;
+				system("pause");
+				system("cls");
+				break;
+			}
+		}
+	}
+	else
+	{
+		p = true;
+		system("pause");
+		system("cls");
+	}
+	if (!p)
+	{
+		cout << "未找到该联系人" << endl;
+		system("pause");
+		system("cls");
+	}
+}
+//清空
+void clearperson(vector<person>& v)
+{
+	int n;
+	cout << "确定要清空通讯录吗" << endl << "******* 1.确定 ******" << endl << "****** 2.取消 ******" << endl;
+	cin >> n;
+	if (n == 1)
+	{
+		v.clear();
+		ofstream ofs;
+		ofs.open("tongxunlu.txt", ios::out);
+		ofs << "";
+		ofs.close();
+		cout << "清空成功" << endl;
+		system("pause");
+		system("cls");
+	}
+	else
+	{
+		system("pause");
+		system("cls");
+	}
+}
+int main()
+{
+	int n;
+	vector<person>v;
+	ininv(v);
+	do
+	{
+		menu();
+		cin >> n;
+		switch (n)
+		{
+		case 1:
+			addperson(v);
+			break;
+		case 2:
+			showperson(v);
+			break;
+		case 3:
+			deleteperson(v);
+			break;
+		case 4:
+			findperson(v);
+			break;
+		case 5:
+			setperson(v);
+			break;
+		case 6:
+			clearperson(v);
+			break;
+		case 0:
+			exit(0);
+			break;
+		default:
+			cout << "输入错误" << endl;
+			system("pause");
+			system("cls");
+		}
+	} while (1);
+	return 0;
+}
